@@ -7,6 +7,7 @@ export default {
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
+			"./1781538098167953245.html"
 	],
 	prefix: "",
 	theme: {
@@ -18,7 +19,13 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				display: ['Oswald', 'sans-serif'],
+				body: ['Golos Text', 'sans-serif']
+			},
 			colors: {
+				porsche: 'hsl(var(--porsche))',
+				gold: 'hsl(var(--gold))',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
