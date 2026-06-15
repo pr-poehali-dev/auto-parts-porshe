@@ -49,15 +49,29 @@ const Index = () => {
 
   const [activeModel, setActiveModel] = useState('911');
   const [form, setForm] = useState({ name: '', phone: '', vin: '', comment: '' });
+  const [sending, setSending] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.phone) {
       toast({ title: 'Заполните имя и телефон', variant: 'destructive' });
       return;
     }
-    toast({ title: 'Заявка отправлена!', description: 'Подберём запчасть и свяжемся с вами в течение часа.' });
-    setForm({ name: '', phone: '', vin: '', comment: '' });
+    setSending(true);
+    try {
+      const res = await fetch('https://functions.poehali.dev/c765a3fb-d2b9-46bc-964f-49662dd3dcc0', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error();
+      toast({ title: '✅ Заявка отправлена!', description: 'Мы свяжемся с вами в течение часа.' });
+      setForm({ name: '', phone: '', vin: '', comment: '' });
+    } catch {
+      toast({ title: 'Ошибка отправки', description: 'Позвоните нам: +7 495 000-00-00', variant: 'destructive' });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -308,8 +322,9 @@ const Index = () => {
             <Input placeholder="Телефон" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             <Input placeholder="VIN-номер (необязательно)" value={form.vin} onChange={(e) => setForm({ ...form, vin: e.target.value })} />
             <Textarea placeholder="Какая запчасть нужна?" rows={3} value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
-            <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
-              <Icon name="Send" size={18} /> Отправить заявку
+            <Button type="submit" size="lg" disabled={sending} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+              <Icon name={sending ? 'Loader2' : 'Send'} size={18} className={sending ? 'animate-spin' : ''} />
+              {sending ? 'Отправляем...' : 'Отправить заявку'}
             </Button>
             <p className="text-xs text-muted-foreground text-center">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных</p>
           </form>
